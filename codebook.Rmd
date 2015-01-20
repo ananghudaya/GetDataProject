@@ -1,11 +1,13 @@
 ---
-title: "Getting and Cleaning Data - Project Code Book"
+title: "Getting and Cleaning Data - Project Codebook"
 author: "Anang Hudaya"
 date: "Tuesday, January 20, 2015"
 output: html_document
 ---
 
-This document describes the variables and other relevant information inside `run_analysis.R`.
+This codebook was generated using `knitr` tool in RStudio. It describes the variables and other relevant information inside `run_analysis.R`.
+
+
 
 ## 1. Data Source
 
@@ -21,78 +23,22 @@ Subject        | `subject_train.txt`  | `subject_test.txt`
 Activity Data  | `y_train.txt`  | `y_test.txt`
 Actual Data    | `x_train.txt`  | `x_test.txt`
 
-## 2. The Process
-
-Some of the processes involved in the creation of tidy dataset is described here.
-
-* Both subject and activity files (train and test) are read using `fread()` method.
-* Data files are read using a helper function:
-
-```{r}
-library(data.table)
-library(reshape2)
-library(dplyr)
-fileToDataTable <- function (f) {
-  df <- read.table(f)
-  dt <- data.table(df)
-}
-dtTrain <- fileToDataTable(file.path(pathIn, "train", "X_train.txt"))
-dtTest  <- fileToDataTable(file.path(pathIn, "test" , "X_test.txt" ))
-```
-
-* Subject tables (train and test) are concatenated using `rbind`.
-```{r}
-dtSubject <- rbind(dtSubjectTrain, dtSubjectTest)
-setnames(dtSubject, "V1", "Subject")
-```
-
-* Activity tables (train and test) are concatenated using `rbind`.
-```{r}
-dtActivity <- rbind(dtActivityTrain, dtActivityTest)
-setnames(dtActivity, "V1", "ActivityNum")
-dt <- rbind(dtTrain, dtTest)
-```
-
-* Both activity and subject tables are merged using `cbind`. 
-```{r}
-dtSubject <- cbind(dtSubject, dtActivity)
-dt <- cbind(dtSubject, dt)
-```
-
-* Mean and standard deviation are extracted from `features.txt`.
-```{r}
-dtFeatures <- fread(file.path(pathIn, "features.txt"))
-setnames(dtFeatures, names(dtFeatures), c("featureNum", "featureName"))
-
-# subsetting only meand and standard deviation
-dtFeatures <- dtFeatures[grepl("mean\\(\\)|std\\(\\)", featureName)]
-
-dtFeatures <- mutate(dtFeatures, featureCode = paste0("V", featureNum))
-select <- c(key(dt), dtFeatures$featureCode)
-dt <- dt[, select, with=FALSE]
-```
-
-* Reading activity_labels.txt file to add descriptive names to the activities
-```{r}
-dtActivityNames <- fread(file.path(pathIn, "activity_labels.txt"))
-setnames(dtActivityNames, names(dtActivityNames), c("ActivityNum", "ActivityName"))
-```
-
-## 3. The Variables
+## 2. Variable List
 
 Here is the list of variables and their descriptions:
 ```{r, echo=FALSE}
-desc <- c("Identifier of train and test subject", "Activity performed by the subject", "Feature Domain", "Acceleration", "Instrument used", "Jerk", "Magnitude", "Mean / Standard Deviation operation", "Axis", "Occurences", "Average Readings")
+desc <- c("Identifier of subject who performed the activity for each window sample. The value ranges from 1 to 30", "Activity performed by the subject", "Feature: Time or frequency signal domain", "Feature: Acceleration signal (body or gravity", "Feature: Measuring instrument used (Accelerometer or Gyroscope", "Feature: Jerk signal", "Feature: Magnitude of the signals calculated using the Euclidean norm", "Feature: Variable (Mean or Standard Deviation)", "Feature: 3-axial signals (X, Y, or Z direction)", "Feature: Count of datapoints used to compute the average", "Feature: Average reading for each activity and each subject")
 columnName <- data.frame(Variable=colnames(dtTidy), description=desc)
 knitr::kable(columnName)
 ```
 
 
-## 4. The Output
+
+## 3. Dataset Structure
 
 Output of this program is a tidy dataset that consists of 11 variables mentioned in the previous section.
 
-### 4.1 Summary
+### 3.1 Summary
 
 Below is the summary of the tidy dataset generated using `run_analysis.R`.
 
@@ -101,11 +47,15 @@ summary(dtTidy)
 
 ```
 
-### 4.2 Snapshot
+### 3.2 Snapshot
 
 A snapshot of the tidy dataset is shown below:
 
 ```{r, echo=FALSE}
 head(dtTidy)
+```
 
+### 3.3 Key Variables
+```{r, echo=FALSE}
+key(dtTidy)
 ```

@@ -31,5 +31,5 @@ From the data set in step 4, creates a second, independent tidy data set with th
 
 ### Outputs
 
-1. Output data: `data.csv`
+1. Output data: `data.txt`
 2. codebook.md

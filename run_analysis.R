@@ -109,5 +109,5 @@ r1 == r2
 setkey(dt, Subject, activity, featDomain, featAcceleration, featInstrument, featJerk, featMagnitude, featVariable, featAxis)
 dtTidy <- dt[, list(count = .N, average = mean(value)), by=key(dt)]
 
-# write to a csv file
-write.csv(dtTidy, "data.csv", row.names = F)
+# write to a txt file
+write.table(dtTidy, "data.txt", row.name=FALSE)
